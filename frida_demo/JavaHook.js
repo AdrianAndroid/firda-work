@@ -6,6 +6,7 @@ function Test01(){
         console.log(Java.use("android.util.Log").getStackTraceString(Java.use("java.lang.Throwable").$new()));
         console.log(arguments[0]);
         console.log(arguments[1]);
+        console.log(arguments[2])
         this.login(arguments[0],arguments[1]);
     }
 }
