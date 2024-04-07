@@ -5,23 +5,25 @@ import sys
 import frida
 import codecs
 
+from basic.Process import Process
+Process('NDKDemo', './NativeHook.js').start()
 
-def message(message, data):
-    if message["type"] == 'send':
-        print("[*] {0}".format(message['payload']))
-    else:
-        print(message)
-
-
-process = frida.get_remote_device().attach('NDKDemo')
-if not os.path.isfile('./NativeHook.js'):
-    raise TypeError("./NativeHook.js does not exist")
-with codecs.open('./NativeHook.js', 'r', 'UTF-8') as file:
-    js_code = file.read()
-script = process.create_script(js_code)
-script.on("message", message)
-script.load()
-sys.stdin.read()
+# def message(message, data):
+#     if message["type"] == 'send':
+#         print("[*] {0}".format(message['payload']))
+#     else:
+#         print(message)
+#
+#
+# process = frida.get_remote_device().attach('NDKDemo')
+# if not os.path.isfile('./NativeHook.js'):
+#     raise TypeError("./NativeHook.js does not exist")
+# with codecs.open('./NativeHook.js', 'r', 'UTF-8') as file:
+#     js_code = file.read()
+# script = process.create_script(js_code)
+# script.on("message", message)
+# script.load()
+# sys.stdin.read()
 
 
 # frida使用非标准端口

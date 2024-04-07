@@ -32,9 +32,10 @@
 #         script.on('message', message)
 #         script.load()
 #         sys.stdin.read()
-from basic.Process import IPProcess
+from basic.Process import Process
 
-IPProcess("NDKDemo", "./JavaHook.js", "127.0.0.1:31928").start()
+Process("NDKDemo", "./JavaHook.js").start()
+# IPProcess("NDKDemo", "./JavaHook.js", "127.0.0.1:31928").start()
 
 # def message(msg, data):
 #     if msg["type"] == 'send':

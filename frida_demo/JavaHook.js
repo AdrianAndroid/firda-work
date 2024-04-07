@@ -18,12 +18,20 @@ function Test02(){
        console.log("=============intent===============");
        console.log(arguments[0]);
        console.log(arguments[1]);
+       console.log(Process.id);
+       console.log(Process.platform)
+       console.log(Process.getCurrentDir())
+       console.log(Process.getHomeDir())
+       console.log(Process.isDebuggerAttached())
+       console.log(Process.enumerateModules());
+       console.log(Java.isMainThread())
        this.$init(arguments[0],arguments[1]);
     }
 }
 
 // HOOK内部类
 function Test03(){
+    // 可以通过JADX中下面的TAB切换查看内部匿名类的名称
     let loginActivity$1 = Java.use('com.yijincc.ndkdemo.LoginActivity$1');
     loginActivity$1.onClick.implementation = function () {
         console.log("=============onClick===============");
@@ -62,18 +70,20 @@ function Test06(){
 }
 
 // 获取当前类已有的实例实现主动调用普通方法
-function Test07(){
-    Java.choose('com.yijincc.ndkdemo.MainActivity',{
-        onMatch: function(obj){ // 枚举时调用
+function Test07() {
+    Java.choose('com.yijincc.ndkdemo.MainActivity', {
+            onMatch: function (obj) { // 枚举时调用
                 console.log(obj);
                 console.log(obj.name.value);
                 console.log(obj.age.value);
                 console.log(obj.sex.value);
-                console.log(obj.rand('B',99))
-            }, onComplete: function(){ // 枚举完成后调用
+                console.log(obj.rand('B', 99))
+            },
+            onComplete: function () { // 枚举完成后调用
                 console.log("end");
             }
-        });
+        }
+    );
 }
 
 // 主动调用静态方法
@@ -186,14 +196,24 @@ rpc.exports = {
     }
 }
 
+function testOthers() {
+    const Activity = Java.use('android.app.Activity');
+    Activity.onResume.implementation = function () {
+        send('onResume() got called!')
+        console.log('onResume() got called!')
+        this.onResume()
+    }
+}
+
 Java.perform(function () {
-    Test01();
+    // testOthers();
+    // Test01();
     // Test02(); // 重载方法
     // Test03(); // 内部类
     // Test04()  // 主动调用构造方法,创建一个对象
     // Test07();
     // Test08();
     // Test10(); // 打印所有的方法
-    // Test11();
+    Test11();
     //Test13();
 });

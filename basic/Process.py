@@ -12,22 +12,38 @@ class Process:
         self.apkName = apkName
         self.jsPath = jsPath
 
-    def start(self):
-        print(self.apkName, self.jsPath)
-        process = frida.get_remote_device().attach(self.apkName)
+    def readJsCode(self):
         if not os.path.isfile(self.jsPath):
             raise TypeError(self.jsPath + ' does not exists')
         with codecs.open(self.jsPath, 'r', 'UTF-8') as file:
             js_code = file.read()
-        script = process.create_script(js_code)
+        return js_code
 
+    def messageCallback(self):
         def message(msg, data):
             if msg["type"] == 'send':
                 print("[*] {0}".format(msg['payload']))
             else:
                 print(msg)
+        return message
 
-        script.on('message', message)
+    def start(self):
+        print(self.apkName, self.jsPath)
+        process = frida.get_remote_device().attach(self.apkName)
+        js_code = self.readJsCode()
+        # if not os.path.isfile(self.jsPath):
+        #     raise TypeError(self.jsPath + ' does not exists')
+        # with codecs.open(self.jsPath, 'r', 'UTF-8') as file:
+        #     js_code = file.read()
+        script = process.create_script(js_code)
+
+        # def message(msg, data):
+        #     if msg["type"] == 'send':
+        #         print("[*] {0}".format(msg['payload']))
+        #     else:
+        #         print(msg)
+
+        script.on('message', self.messageCallback())
         script.load()
         sys.stdin.read()
 
@@ -44,7 +60,7 @@ class Process:
 # script.load()
 # sys.stdin.read()
 
-
+# adb forward tcp:31928 tcp:31928
 class IPProcess(Process):
     __remoteIp = ''
 
@@ -55,18 +71,27 @@ class IPProcess(Process):
     def start(self):
         print(self.apkName, self.jsPath, self.__remoteIp)
         process = frida.get_device_manager().add_remote_device(self.__remoteIp).attach(self.apkName)
-        if not os.path.isfile(self.jsPath):
-            raise TypeError(self.jsPath + ' does not exists')
-        with codecs.open(self.jsPath, 'r', 'UTF-8') as file:
-            js_code = file.read()
+        # if not os.path.isfile(self.jsPath):
+        #     raise TypeError(self.jsPath + ' does not exists')
+        # with codecs.open(self.jsPath, 'r', 'UTF-8') as file:
+        #     js_code = file.read()
+        js_code = self.readJsCode()
         script = process.create_script(js_code)
-
-        def message(msg, data):
-            if msg["type"] == 'send':
-                print("[*] {0}".format(msg['payload']))
-            else:
-                print(msg)
-
-        script.on('message', message)
+        # def message(msg, data):
+        #     if msg["type"] == 'send':
+        #         print("[*] {0}".format(msg['payload']))
+        #     else:
+        #         print(msg)
+        script.on('message', self.messageCallback())
         script.load()
         sys.stdin.read()
+
+# class USBProcess:
+#     def start(self):
+#         def message(msg, data):
+#             if msg["type"] == 'send':
+#                 print("[*] {0}".format(msg['payload']))
+#             else:
+#                 print(msg)
+#         process = frida.get_usb_device().attach('com.example.xxx')
+#         script = process.create_script
